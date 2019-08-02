@@ -65,9 +65,13 @@ ifeq ($(GOOS), linux)
 endif
 
 # build chaosblade package and image
-build: pre_build build_osbin build_cli
+build: pre_build build_osbin build_cli build_httpagent
 	# tar package
 	tar zcvf $(BUILD_TARGET_PKG_FILE_PATH) -C $(BUILD_TARGET) $(BUILD_TARGET_DIR_NAME)
+
+#build_httpagent
+build_httpagent:
+	$(GO) build $(GO_FLAGS) -o $(BUILD_TARGET_BIN)/http_agent ./exec/httpagent
 
 # build chaosblade cli: blade
 build_cli:

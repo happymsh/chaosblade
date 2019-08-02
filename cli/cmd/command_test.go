@@ -180,3 +180,23 @@ func (*MockSource) UpdatePreparationPortByUid(uid, port string) error {
 func (*MockSource) UpdatePreparationPidByUid(uid, pid string) error {
 	return nil
 }
+
+func (*MockSource) CheckAndInitExperimentPlanTable() {
+
+}
+
+func (*MockSource) ExperimentPlanTableExists() (bool, error) {
+	return true, nil
+}
+
+func (*MockSource) InitExperimentPlanTable() error {
+	return nil
+}
+
+func (*MockSource) InsertExperimentPlanModel(model *data.ExperimentPlanModel) error {
+	return nil
+}
+
+func (*MockSource) UpdateExperimentPlanModelByExpId(expId, status, errMsg string) error {
+	return nil
+}

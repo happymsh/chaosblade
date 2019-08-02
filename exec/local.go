@@ -3,12 +3,14 @@ package exec
 import (
 	"context"
 	"fmt"
-	"github.com/chaosblade-io/chaosblade/transport"
-	"github.com/chaosblade-io/chaosblade/util"
 	"os/exec"
 	"strings"
 	"time"
+
 	"github.com/sirupsen/logrus"
+
+	"github.com/chaosblade-io/chaosblade/transport"
+	"github.com/chaosblade-io/chaosblade/util"
 )
 
 var channel = &LocalChannel{}

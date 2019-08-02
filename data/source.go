@@ -2,12 +2,14 @@ package data
 
 import (
 	"database/sql"
-	"github.com/chaosblade-io/chaosblade/util"
-	"path"
-	"github.com/sirupsen/logrus"
-	"sync"
-	_ "github.com/mattn/go-sqlite3"
 	"fmt"
+	"path"
+	"sync"
+
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/sirupsen/logrus"
+
+	"github.com/chaosblade-io/chaosblade/util"
 )
 
 const dataFile = "chaosblade.dat"
@@ -15,6 +17,7 @@ const dataFile = "chaosblade.dat"
 type SourceI interface {
 	ExperimentSource
 	PreparationSource
+	ExperimentPlanSource
 }
 
 type Source struct {
@@ -44,6 +47,7 @@ const tableExistsDQL = `SELECT count(*) AS c
 func (s *Source) init() {
 	s.CheckAndInitExperimentTable()
 	s.CheckAndInitPreTable()
+	s.CheckAndInitExperimentPlanTable()
 }
 
 func getConnection() *sql.DB {
