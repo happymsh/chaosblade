@@ -21,6 +21,7 @@ require (
 
 // Pinned to kubernetes-1.13.11
 replace (
+	github.com/chaosblade-io/chaosblade-exec-os => github.com/yixy/chaosblade-exec-os v0.5.1
 	k8s.io/api => k8s.io/api v0.0.0-20190817221950-ebce17126a01
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190919022157-e8460a76b3ad
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190817221809-bf4de9df677c
