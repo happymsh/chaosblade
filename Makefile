@@ -9,6 +9,12 @@ ifneq ($(strip $(firstword $(sort $(GITVERSION), $(ALLOWGITVERSION)))),$(ALLOWGI
 	ALERTMSG="please update git to >= $(ALLOWGITVERSION)"
 endif
 
+#env
+BUILD_TARGET_DOC=$(BUILD_TARGET_PKG_DIR)/doc
+BUILD_TARGET_CONF=$(BUILD_TARGET_PKG_DIR)/conf
+AGENT_VERSION=0.1.4
+AGENT_VERSION_PKG=gitlab.sdc.icbc/distributed-technology/chaosmonkey/chaos-agent/agent/cli
+
 BLADE_BIN=blade
 BLADE_EXPORT=chaosblade-$(BLADE_VERSION).tgz
 BLADE_SRC_ROOT=`pwd`
@@ -16,7 +22,8 @@ BLADE_SRC_ROOT=`pwd`
 GO_ENV=CGO_ENABLED=1
 GO_MODULE=GO111MODULE=on
 VERSION_PKG=github.com/chaosblade-io/chaosblade/version
-GO_FLAGS=-ldflags="-X ${VERSION_PKG}.Ver=$(BLADE_VERSION) -X '${VERSION_PKG}.Env=`uname -mv`' -X '${VERSION_PKG}.BuildTime=`date`'"
+GO_FLAGS= -ldflags="-X ${AGENT_VERSION_PKG}.AgtVer=$(AGENT_VERSION) -X ${VERSION_PKG}.Ver=$(BLADE_VERSION) -X '${VERSION_PKG}.Env=`uname -mv`' -X '${VERSION_PKG}.BuildTime=`date`'"
+
 GO=env $(GO_ENV) $(GO_MODULE) go
 
 UNAME := $(shell uname)
@@ -35,8 +42,8 @@ BUILD_IMAGE_PATH=build/image/blade
 BUILD_TARGET_CACHE=$(BUILD_TARGET)/cache
 
 # chaosblade-exec-os
-BLADE_EXEC_OS_PROJECT=https://github.com/chaosblade-io/chaosblade-exec-os.git
-BLADE_EXEC_OS_BRANCH=v0.5.0
+BLADE_EXEC_OS_PROJECT=https://github.com/yixy/chaosblade-exec-os.git
+BLADE_EXEC_OS_BRANCH=v0.5.1
 
 # chaosblade-exec-docker
 BLADE_EXEC_DOCKER_PROJECT=https://github.com/chaosblade-io/chaosblade-exec-docker.git
@@ -85,7 +92,7 @@ build_with_linux: pre_build build_linux_with_arg
 # build chaosblade cli: blade
 build_cli:
 	# build blade cli
-	$(GO) build $(GO_FLAGS) -o $(BUILD_TARGET_PKG_DIR)/blade ./cli
+	$(GO) build $(GO_FLAGS) -o $(BUILD_TARGET_PKG_DIR)/blade ./agent
 
 # build os
 build_os:
@@ -158,6 +165,9 @@ endif
 pre_build:mkdir_build_target
 	rm -rf $(BUILD_TARGET_PKG_DIR) $(BUILD_TARGET_PKG_FILE_PATH)
 	mkdir -p $(BUILD_TARGET_BIN) $(BUILD_TARGET_LIB)
+	cp -r agent/_doc $(BUILD_TARGET_DOC)
+	cp -r conf $(BUILD_TARGET_CONF)
+
 
 # create cache dir
 mkdir_build_target:
@@ -175,7 +185,7 @@ build_linux:
 	docker build -f build/image/musl/Dockerfile -t chaosblade-build-musl:latest build/image/musl
 	docker run --rm \
 		-v $(shell echo -n ${GOPATH}):/go \
-		-w /go/src/github.com/chaosblade-io/chaosblade \
+		-w /go/src/github.com/yixy/chaosblade \
 		-v ~/.m2/repository:/root/.m2/repository \
 		chaosblade-build-musl:latest
 

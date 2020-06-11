@@ -1,0 +1,57 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+POST http://122.66.29.88:8081/chaosagent/api/exp/dispatch
+Content-Type: application/json
+
+{
+  "job_id": "flowid|taskid|ip|port",
+  "portal_time": 1567825776000,
+  "flow_starttime":1567825776000,
+  "duration": 70000,
+  "events": [
+    {
+      "event_id": "mem-6",
+      "command": "mem",
+      "sub_command": "load",
+      "flag": " --mem-percent=20",
+      "start_offset": 10000,
+      "end_offset":20000
+    },{
+      "event_id": "mem-7",
+      "command": "mem",
+      "sub_command": "load",
+      "flag": "--mem-percent=50 ",
+      "start_offset": 20000,
+      "end_offset":30000
+    },{
+      "event_id": "mem-8",
+      "command": "mem",
+      "sub_command": "load",
+      "flag": " --mem-percent=70 ",
+      "start_offset": 30000,
+      "end_offset":40000
+    },{
+      "event_id": "mem-9",
+      "command": "mem",
+      "sub_command": "load",
+      "flag": "--mem-percent=90 ",
+      "start_offset": 40000,
+      "end_offset":50000
+    },{
+      "event_id": "mem-10",
+      "command": "mem",
+      "sub_command": "load",
+      "flag": " --mem-percent=100 ",
+      "start_offset": 50000,
+      "end_offset":60000
+    }
+  ]
+}
+
+###
