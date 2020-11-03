@@ -70,7 +70,7 @@ ifeq ($(GOOS), linux)
 endif
 
 # build chaosblade package and image
-build: pre_build build_cli build_os build_docker build_kubernetes build_java build_cplus
+build: pre_build build_cli build_hzcp build_os build_docker build_kubernetes build_java build_cplus
 	# tar package
 	tar zcvf $(BUILD_TARGET_PKG_FILE_PATH) -C $(BUILD_TARGET) $(BUILD_TARGET_DIR_NAME)
 
@@ -213,6 +213,12 @@ docker_image: clean
 	docker build -f ./Dockerfile \
 		--build-arg BLADE_VERSION=$(BLADE_VERSION) \
 		-t chaosblade:$(BLADE_VERSION) $(BLADE_SRC_ROOT)
+
+build_hzcp:
+	$(GO) build $(GO_FLAGS) -o $(BUILD_TARGET_PKG_DIR)/bin/hzcpcpufullload ./plugin/hzcp/bin/cpufullload
+	$(GO) build $(GO_FLAGS) -o $(BUILD_TARGET_PKG_DIR)/bin/hzcpjvmoom ./plugin/hzcp/bin/jvmoom
+	$(GO) build $(GO_FLAGS) -o $(BUILD_TARGET_PKG_DIR)/bin/hzcpjvmthreadfull ./plugin/hzcp/bin/jvmthreadfull
+	$(GO) run ./plugin/hzcp/spec $(BUILD_TARGET_PKG_DIR)/bin/hzcp.yaml
 
 # test
 test:

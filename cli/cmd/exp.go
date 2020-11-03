@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/chaosblade-io/chaosblade/plugin/hzcp"
+
 	"github.com/chaosblade-io/chaosblade-spec-go/channel"
 	"github.com/chaosblade-io/chaosblade-spec-go/spec"
 	"github.com/chaosblade-io/chaosblade-spec-go/util"
@@ -112,6 +114,7 @@ func (ec *baseExpCommandService) GetExecutor(target, actionTarget, action string
 
 func (ec *baseExpCommandService) registerSubCommands() {
 	// register os type command
+	ec.registerHzcpExpCommands()
 	ec.registerOsExpCommands()
 	// register jvm framework commands
 	ec.registerJvmExpCommands()
@@ -127,6 +130,22 @@ func (ec *baseExpCommandService) registerSubCommands() {
 func (ec *baseExpCommandService) registerOsExpCommands() []*modelCommand {
 	file := path.Join(util.GetBinPath(), fmt.Sprintf("chaosblade-os-spec-%s.yaml", version.Ver))
 	models, err := specutil.ParseSpecsToModel(file, os.NewExecutor())
+	if err != nil {
+		return nil
+	}
+	osCommands := make([]*modelCommand, 0)
+	for idx := range models.Models {
+		model := &models.Models[idx]
+		command := ec.registerExpCommand(model, "")
+		osCommands = append(osCommands, command)
+	}
+	return osCommands
+}
+
+// registerOsExpCommands
+func (ec *baseExpCommandService) registerHzcpExpCommands() []*modelCommand {
+	file := path.Join(util.GetBinPath(), "hzcp.yaml")
+	models, err := specutil.ParseSpecsToModel(file, hzcp.NewExecutor())
 	if err != nil {
 		return nil
 	}

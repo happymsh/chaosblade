@@ -3,12 +3,13 @@ module github.com/chaosblade-io/chaosblade
 go 1.13
 
 require (
-	github.com/NYTimes/gziphandler v1.0.1 // indirect
+	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/chaosblade-io/chaosblade-exec-docker v0.5.0
 	github.com/chaosblade-io/chaosblade-exec-os v0.5.0
 	github.com/chaosblade-io/chaosblade-operator v0.5.0
 	github.com/chaosblade-io/chaosblade-spec-go v0.5.0
 	github.com/coreos/etcd v3.3.22+incompatible // indirect
+	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/etcd-io/etcd v3.3.22+incompatible
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/mattn/go-sqlite3 v1.10.1-0.20190217174029-ad30583d8387
@@ -28,6 +29,7 @@ require (
 
 // Pinned to kubernetes-1.13.11
 replace (
+	bitbucket.org/ww/goautoneg => github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
 	github.com/chaosblade-io/chaosblade-exec-os => github.com/yixy/chaosblade-exec-os v0.5.1
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829
 	github.com/prometheus/common => github.com/prometheus/common v0.3.0
