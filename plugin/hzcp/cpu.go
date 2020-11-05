@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"path"
-	"strconv"
 
 	"github.com/chaosblade-io/chaosblade-spec-go/channel"
 	"github.com/chaosblade-io/chaosblade-spec-go/spec"
@@ -45,8 +44,13 @@ func NewCpuCommandModelSpec() spec.ExpModelCommandSpec {
 			},
 			ExpFlags: []spec.ExpFlagSpec{
 				&spec.ExpFlag{
-					Name:     "cpu-percent",
-					Desc:     "temporary useless flag...percent of burn CPU (0-100)",
+					Name:     "keyword",
+					Desc:     "using for matching target Java process",
+					Required: true,
+				},
+				&spec.ExpFlag{
+					Name:     "port",
+					Desc:     "using for attaching target Java process",
 					Required: false,
 				},
 			},
@@ -121,32 +125,18 @@ func (ce *cpuExecutor) Exec(uid string, ctx context.Context, model *spec.ExpMode
 	if _, ok := spec.IsDestroy(ctx); ok {
 		return ce.stop(ctx)
 	}
-	var cpuPercent int
 
-	cpuPercentStr := model.ActionFlags["cpu-percent"]
-	if cpuPercentStr != "" {
-		var err error
-		cpuPercent, err = strconv.Atoi(cpuPercentStr)
-		if err != nil {
-			return spec.ReturnFail(spec.Code[spec.IllegalParameters],
-				"--cpu-percent value must be a positive integer")
-		}
-		if cpuPercent > 100 || cpuPercent < 0 {
-			return spec.ReturnFail(spec.Code[spec.IllegalParameters],
-				"--cpu-percent value must be a prositive integer and not bigger than 100")
-		}
-	} else {
-		cpuPercent = 100
-	}
+	keyWord := model.ActionFlags["keyword"]
+	port := model.ActionFlags["port"]
 
-	return ce.start(ctx, cpuPercent)
+	return ce.start(ctx, keyWord, port)
 }
 
 const hzcpcpufullload = "hzcpcpufullload"
 
 // start burn cpu
-func (ce *cpuExecutor) start(ctx context.Context, cpuPercent int) *spec.Response {
-	args := fmt.Sprintf("--start --debug=%t", util.Debug)
+func (ce *cpuExecutor) start(ctx context.Context, keyWord string, port string) *spec.Response {
+	args := fmt.Sprintf("--start --keyword=%s --port=%s --debug=%t", keyWord, port, util.Debug)
 	return ce.channel.Run(ctx, path.Join(ce.channel.GetScriptPath(), hzcpcpufullload), args)
 }
 

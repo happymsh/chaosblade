@@ -8,7 +8,6 @@ import (
 	"github.com/chaosblade-io/chaosblade-spec-go/util"
 )
 
-const HzcpJarName string = "myAgent-jar-with-dependencies.jar"
 const ErrPrefix = "Error:"
 
 var ExitFunc = os.Exit

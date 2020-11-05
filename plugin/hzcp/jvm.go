@@ -46,6 +46,18 @@ func NewJvmCommandModelSpec() spec.ExpModelCommandSpec {
 					},
 				},
 			},
+			ExpFlags: []spec.ExpFlagSpec{
+				&spec.ExpFlag{
+					Name:     "keyword",
+					Desc:     "using for matching target Java process",
+					Required: true,
+				},
+				&spec.ExpFlag{
+					Name:     "port",
+					Desc:     "using for attaching target Java process",
+					Required: false,
+				},
+			},
 		},
 	}
 }

@@ -61,35 +61,22 @@ func (ce *jvmOomExecutor) Exec(uid string, ctx context.Context, model *spec.ExpM
 	if _, ok := spec.IsDestroy(ctx); ok {
 		return ce.stop(ctx)
 	}
-	//var jvmPercent int
+	keyWord := model.ActionFlags["keyword"]
+	port := model.ActionFlags["port"]
 
-	//jvmPercentStr := model.ActionFlags["jvm-percent"]
-	//if jvmPercentStr != "" {
-	//	var err error
-	//	jvmPercent, err = strconv.Atoi(jvmPercentStr)
-	//	if err != nil {
-	//		return spec.ReturnFail(spec.Code[spec.IllegalParameters],
-	//			"--jvm-percent value must be a positive integer")
-	//	}
-	//	if jvmPercent > 100 || jvmPercent < 0 {
-	//		return spec.ReturnFail(spec.Code[spec.IllegalParameters],
-	//			"--jvm-percent value must be a prositive integer and not bigger than 100")
-	//	}
-	//} else {
-	//	jvmPercent = 100
-	//}
-
-	return ce.start(ctx)
+	return ce.start(ctx, keyWord, port)
 }
 
+const hzcpjvmoom = "hzcpjvmoom"
+
 // start burn jvm
-func (ce *jvmOomExecutor) start(ctx context.Context) *spec.Response {
-	args := fmt.Sprintf("--start --debug=%t", util.Debug)
-	return ce.channel.Run(ctx, path.Join(ce.channel.GetScriptPath(), hzcpcpufullload), args)
+func (ce *jvmOomExecutor) start(ctx context.Context, keyWord string, port string) *spec.Response {
+	args := fmt.Sprintf("--start --keyword=%s --port=%s --debug=%t", keyWord, port, util.Debug)
+	return ce.channel.Run(ctx, path.Join(ce.channel.GetScriptPath(), hzcpjvmoom), args)
 }
 
 // stop burn jvm
 func (ce *jvmOomExecutor) stop(ctx context.Context) *spec.Response {
-	return ce.channel.Run(ctx, path.Join(ce.channel.GetScriptPath(), hzcpcpufullload),
+	return ce.channel.Run(ctx, path.Join(ce.channel.GetScriptPath(), hzcpjvmoom),
 		fmt.Sprintf("--stop --debug=%t", util.Debug))
 }
