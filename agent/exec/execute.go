@@ -32,3 +32,17 @@ func ExecuteExp(ctx context.Context, command, subCommand, flags, timeout string)
 	}
 	return CRun(ctx, path.Join(util.GetProgramPath(), BLADE), args)
 }
+
+//written by mash for supporting jvm command
+
+func ExecutePreExp(ctx context.Context, preCommand, preSubCommand, preFlag, timeout string) *spec.Response {
+	args := fmt.Sprintf("%s %s", preCommand, preSubCommand)
+	for _, preFlag := range strings.Fields(preFlag) {
+		//args = fmt.Sprintf("%s --%s", args, flag)
+		args = fmt.Sprintf("%s %s", args, preFlag)
+	}
+	if timeout != "" {
+		args = fmt.Sprintf("%s --timeout=%s", args, timeout)
+	}
+	return CRun(ctx, path.Join(util.GetProgramPath(), BLADE), args)
+}

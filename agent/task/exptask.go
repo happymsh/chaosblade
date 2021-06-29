@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/chaosblade-io/chaosblade/agent/exec"
 	"github.com/chaosblade-io/chaosblade/agent/pdata"
+	"github.com/sirupsen/logrus"
 )
 
 var mutex sync.RWMutex = sync.RWMutex{}
@@ -23,6 +23,8 @@ var queryExperimentPlanModelOrderByStartTime = pSource.QueryToProcessExperimentP
 var updateExperimentPlanModelByExpId = pSource.UpdateExperimentPlanModelStatusByExpId
 var queryExperimentModelByUid = pSource.QueryExperimentModelByUid
 var executeExp = exec.ExecuteExp
+//add jvm
+var executePreExp = exec.ExecutePreExp
 var cRun = exec.CRun
 
 //non-support multi-goroutine
@@ -126,7 +128,7 @@ func ExpTaskArrange(ctx context.Context, terminalFlag bool) *spec.Response {
 				break
 			}
 			logrus.Info("start a exp:", fmt.Sprintf("%+v", planModel))
-			ctxTimeout, _ := context.WithTimeout(ctx, 60*time.Second)
+			/*ctxTimeout, _ := context.WithTimeout(ctx, 60*time.Second)
 			response := executeExp(ctxTimeout, planModel.Command, planModel.SubCommand, planModel.Flag, "")
 			if !response.Success {
 				logrus.Error("ExpTaskArrange error by ExecuteExp:", response)
@@ -147,8 +149,76 @@ func ExpTaskArrange(ctx context.Context, terminalFlag bool) *spec.Response {
 			if err != nil {
 				logrus.Error("ExpTaskArrange error by updateExperimentPlanModelByExpId.", err)
 				break
+			}*/
+
+			//written by mash
+			ctxTimeout, _ := context.WithTimeout(ctx, 60*time.Second)
+			if planModel.PreCommand == "" || len(planModel.PreCommand) == 0  {
+				//ctxTimeout, _ := context.WithTimeout(ctx, 60*time.Second)
+				response := executeExp(ctxTimeout, planModel.Command, planModel.SubCommand, planModel.Flag, "")
+				if !response.Success {
+					logrus.Error("ExpTaskArrange error by ExecuteExp:", response)
+					break
+				}
+				result, ok := response.Result.(string)
+				if !ok {
+					logrus.Error("ExpTaskArrange error by response.Result assert")
+					break
+				}
+				r := &exec.Result{}
+				err = json.Unmarshal([]byte(result), r)
+				if err != nil {
+					logrus.Error("ExpTaskArrange error by Unmarshal response.result:", err)
+					break
+				}
+				err = updateExperimentPlanModelByExpId(planModel.ExpId, r.Result, pdata.Processing, "")
+				if err != nil {
+					logrus.Error("ExpTaskArrange error by updateExperimentPlanModelByExpId.", err)
+					break
+				}
+			}else {
+				result := false
+				result = preExpTask(ctxTimeout, planModel.PreCommand, planModel.PreSubCommand, planModel.PreFlag)
+				if result {
+					response := executeExp(ctxTimeout, planModel.Command, planModel.SubCommand, planModel.Flag, "")
+					if !response.Success {
+						logrus.Error("ExpTaskArrange error by ExecuteExp:", response)
+						break
+					}
+					result, ok := response.Result.(string)
+					if !ok {
+						logrus.Error("ExpTaskArrange error by response.Result assert")
+						break
+					}
+					r := &exec.Result{}
+					err = json.Unmarshal([]byte(result), r)
+					if err != nil {
+						logrus.Error("ExpTaskArrange error by Unmarshal response.result:", err)
+						break
+					}
+					err = updateExperimentPlanModelByExpId(planModel.ExpId, r.Result, pdata.Processing, "")
+					if err != nil {
+						logrus.Error("ExpTaskArrange error by updateExperimentPlanModelByExpId.", err)
+						break
+					}
+				} else {
+					logrus.Error("preExpTask error reason is  pre_result:", result)
+					break
+				}
 			}
+
 		}
 	}
 	return nil
+}
+
+//written by mash
+func preExpTask(ctx context.Context, preCommand string, preSubCommand string, preFlag string) bool {
+	var preResponse *spec.Response
+	preResponse=executePreExp(ctx, preCommand, preSubCommand, preFlag, "")
+	if !preResponse.Success {
+		logrus.Error("preExpTask error by preExpTask:", preResponse)
+		return false
+	}
+	return true
 }

@@ -17,7 +17,10 @@ type ExperimentPlanModel struct {
 	Command     string `json:"command"`
 	SubCommand  string `json:"sub_command"`
 	Flag        string `json:"flag"`
-	Status      string //0-ToBeProcessed 1-Processing 2-SuccessfulProcessing 3-ProcessingFailure
+	PreCommand  string `json:"pre_command"`
+	PreSubCommand string `json:"pre_sub_command"`
+	PreFlag     string  `json:"pre_flag"`
+	Status      string //0-ToBeProcessed 1-Processing 2-SuccessfulProcessing 3-ProcessingFailurepre
 	Error       string
 	StartOffset int64     `json:"start_offset"` //Millisecond
 	EndOffset   int64     `json:"end_offset"`   //Millisecond
@@ -64,6 +67,9 @@ const expPlanTableDDL = `CREATE TABLE IF NOT EXISTS experiment_plan (
 	command VARCHAR NOT NULL,
 	sub_command VARCHAR,
 	flag VARCHAR,
+	pre_command  VARCHAR,
+	pre_sub_command VARCHAR,
+	pre_flag VARCHAR,
 	status VARCHAR NOT NULL,
 	error VARCHAR,
 	start_offset integer,
@@ -82,9 +88,9 @@ var expPlanIndexDDL = []string{
 	`CREATE INDEX experiment_plan_expid_idx ON experiment_plan (exp_id)`,
 }
 
-var insertExpPlanDML = `INSERT INTO 
-	experiment_plan (exp_id, job_id, nodetime_gap, uid, command, sub_command, flag, status, error, start_offset, end_offset, start_time, end_time, create_time, update_time)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+var insertExpPlanDML = `INSERT INTO
+	experiment_plan (exp_id, job_id, nodetime_gap, uid, command, sub_command, flag, pre_command, pre_sub_command, pre_flag, status, error, start_offset, end_offset, start_time, end_time, create_time, update_time)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 func (s *PSource) CheckAndInitExperimentPlanTable() {
@@ -147,6 +153,9 @@ func InsertExperimentPlanModel(tx *sql.Tx, model *ExperimentPlanModel) error {
 		model.Command,
 		model.SubCommand,
 		model.Flag,
+		model.PreCommand,
+		model.PreSubCommand,
+		model.PreFlag,
 		model.Status,
 		model.Error,
 		model.StartOffset,
@@ -202,9 +211,10 @@ func getExperimentPlanModelsFrom(rows *sql.Rows) ([]*ExperimentPlanModel, error)
 	models := make([]*ExperimentPlanModel, 0)
 	for rows.Next() {
 		var nodetimeGap, startOffset, endOffset int64
-		var expId, jobId, uid, command, subCommand, flag, status, error string
+		//var expId, jobId, uid, command, subCommand, flag, status, error string
+		var expId, jobId, uid, command, subCommand, flag, preCommand, preSubCommand, preFlag,status, error string
 		var startTime, endTime, createTime, updateTime time.Time
-		err := rows.Scan(&expId, &jobId, &nodetimeGap, &uid, &command, &subCommand, &flag, &status, &error, &startOffset, &endOffset, &startTime, &endTime, &createTime, &updateTime)
+		err := rows.Scan(&expId, &jobId, &nodetimeGap, &uid, &command, &subCommand, &flag, &preCommand, &preSubCommand, &preFlag, &status, &error, &startOffset, &endOffset, &startTime, &endTime, &createTime, &updateTime)
 		if err != nil {
 			return nil, err
 		}
@@ -216,6 +226,9 @@ func getExperimentPlanModelsFrom(rows *sql.Rows) ([]*ExperimentPlanModel, error)
 			Command:     command,
 			SubCommand:  subCommand,
 			Flag:        flag,
+			PreCommand:  preCommand,
+			PreSubCommand: preSubCommand,
+			PreFlag:     preFlag,
 			Status:      status,
 			Error:       error,
 			StartOffset: startOffset,

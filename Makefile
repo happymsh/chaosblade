@@ -42,7 +42,7 @@ BUILD_IMAGE_PATH=build/image/blade
 BUILD_TARGET_CACHE=$(BUILD_TARGET)/cache
 
 # chaosblade-exec-os
-BLADE_EXEC_OS_PROJECT=https://github.com/yixy/chaosblade-exec-os.git
+BLADE_EXEC_OS_PROJECT=https://github.com/happymsh/chaosblade-exec-os.git
 BLADE_EXEC_OS_BRANCH=v0.5.1
 
 # chaosblade-exec-docker
@@ -185,7 +185,7 @@ build_linux:
 	docker build -f build/image/musl/Dockerfile -t chaosblade-build-musl:latest build/image/musl
 	docker run --rm \
 		-v $(shell echo -n ${GOPATH}):/go \
-		-w /go/src/github.com/yixy/chaosblade \
+		-w /go/src/github.com/happymsh/chaosblade \
 		-v ~/.m2/repository:/root/.m2/repository \
 		chaosblade-build-musl:latest
 

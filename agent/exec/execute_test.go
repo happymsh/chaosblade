@@ -23,3 +23,20 @@ func TestCallExp(t *testing.T) {
 		t.Error(result.ToString())
 	}
 }
+
+func TestCallPreExp(t *testing.T) {
+	success := spec.ReturnSuccess("call preExp success.")
+	CRun = func(ctx context.Context, script, args string) *spec.Response {
+		if args == "prepare jvm --pid 10000" {
+			return success
+		} else {
+			return spec.Return(spec.Code[spec.ExecCommandError])
+		}
+	}
+	result := ExecutePreExp(context.TODO(), "p", "jvm", "--pid 10000", "" )
+	if success == result {
+		t.Log(result.ToString())
+	} else {
+		t.Error(result.ToString())
+	}
+}
